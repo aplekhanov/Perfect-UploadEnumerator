@@ -29,8 +29,8 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "F883804E1BEBE57A00508D7F"
-               BuildableName = "Upload Enumerator Server.framework"
-               BlueprintName = "Upload Enumerator Server"
+               BuildableName = "Upload Enumerator.framework"
+               BlueprintName = "Upload Enumerator"
                ReferencedContainer = "container:Upload Enumerator.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
