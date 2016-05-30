@@ -3,7 +3,9 @@ This example illustrates how to extract file upload information from a request. 
 
 To use the example with Swift Package Manager, type ```swift build``` and then run ``` .build/debug/UploadEnumerator```.
 
-To use the example with Xcode, run the **Upload Enumerator** target. This will launch the **Perfect Server HTTP** app. Then click the "open in browser" button as show below.
+To use the example with Xcode, run the **Upload Enumerator** target. This will launch the Perfect HTTP Server. 
+
+Navigate in your web browser to [http://localhost:8181/](http://localhost:8181/)
 
 ## Server Operations
 1. The server module consists of two relevent files:
