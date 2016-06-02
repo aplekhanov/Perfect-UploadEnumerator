@@ -25,13 +25,7 @@ func addUploadHandlerRoutes() {
         request, response in
         
         let webRoot = request.documentRoot
-        do {
-            try mustacheRequest(request: request, response: response, handler: UploadHandler(), path: webRoot + "/index.mustache")
-        } catch {
-            response.setStatus(code: 500, message: "Server Error")
-            response.appendBody(string: "\(error)")
-        }
-        response.requestCompleted()
+        mustacheRequest(request: request, response: response, handler: UploadHandler(), templatePath: webRoot + "/index.mustache")
     }
 }
 
@@ -53,52 +47,61 @@ struct UploadHandler: MustachePageHandler { // all template handlers must inheri
 	// It is called by the system to allow the handler to return the set of values which will be used when populating the template.
 	// - parameter context: The MustacheEvaluationContext which provides access to the WebRequest containing all the information pertaining to the request
 	// - parameter collector: The MustacheEvaluationOutputCollector which can be used to adjust the template output. For example a `defaultEncodingFunc` could be installed to change how outgoing values are encoded.
-	func valuesForResponse(context contxt: MustacheEvaluationContext, collector: MustacheEvaluationOutputCollector) throws -> MustacheEvaluationContext.MapType {
+	func extendValuesForResponse(context contxt: MustacheEvaluationContext, collector: MustacheEvaluationOutputCollector) {
 	#if DEBUG
 		print("UploadHandler got request")
 	#endif
 		var values = MustacheEvaluationContext.MapType()
 		// Grab the WebRequest so we can get information about what was uploaded
-		if let request = contxt.webRequest {
-			// Grab the fileUploads array and see what's there
-			// If this POST was not multi-part, then this array will be empty
-			let uploads = request.fileUploads
-			if uploads.count > 0 {
-				// Create an array of dictionaries which will show what was uploaded
-				// This array will be used in the corresponding mustache template
-				var ary = [[String:Any]]()
-				
-				for upload in uploads {
-					ary.append([
-						"fieldName": upload.fieldName,
-						"contentType": upload.contentType,
-						"fileName": upload.fileName,
-						"fileSize": upload.fileSize,
-						"tmpFileName": upload.tmpFileName
-						])
-				}
-				values["files"] = ary
-				values["count"] = ary.count
-			}
-			
-			// Grab the regular form parameters
-			let params = request.params()
-			if params?.count > 0 {
-				// Create an array of dictionaries which will show what was posted
-				// This will not include any uploaded files. Those are handled above.
-				var ary = [[String:Any]]()
-				
-				for (name, value) in params! {
-					ary.append([
-						"paramName":name,
-						"paramValue":value
-						])
-				}
-				values["params"] = ary
-				values["paramsCount"] = ary.count
-			}
-		}
+        let request = contxt.webRequest
+        
+        // Grab the fileUploads array and see what's there
+        // If this POST was not multi-part, then this array will be empty
+        let uploads = request.fileUploads
+        if uploads.count > 0 {
+            // Create an array of dictionaries which will show what was uploaded
+            // This array will be used in the corresponding mustache template
+            var ary = [[String:Any]]()
+            
+            for upload in uploads {
+                ary.append([
+                    "fieldName": upload.fieldName,
+                    "contentType": upload.contentType,
+                    "fileName": upload.fileName,
+                    "fileSize": upload.fileSize,
+                    "tmpFileName": upload.tmpFileName
+                    ])
+            }
+            values["files"] = ary
+            values["count"] = ary.count
+        }
+        
+        // Grab the regular form parameters
+        let params = request.params()
+        if params?.count > 0 {
+            // Create an array of dictionaries which will show what was posted
+            // This will not include any uploaded files. Those are handled above.
+            var ary = [[String:Any]]()
+            
+            for (name, value) in params! {
+                ary.append([
+                    "paramName":name,
+                    "paramValue":value
+                    ])
+            }
+            values["params"] = ary
+            values["paramsCount"] = ary.count
+        }
+        
 		values["title"] = "Upload Enumerator"
-		return values
+		contxt.extendValues(with: values)
+        do {
+            try contxt.requestCompleted(withCollector: collector)
+        } catch {
+            let response = contxt.webResponse
+            response.setStatus(code: 500, message: "Server Error")
+            response.appendBody(string: "\(error)")
+            response.requestCompleted()
+        }
 	}
 }
