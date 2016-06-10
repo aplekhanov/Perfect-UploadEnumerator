@@ -78,12 +78,12 @@ struct UploadHandler: MustachePageHandler { // all template handlers must inheri
         
         // Grab the regular form parameters
         let params = request.params()
-        if params?.count > 0 {
+        if params.count > 0 {
             // Create an array of dictionaries which will show what was posted
             // This will not include any uploaded files. Those are handled above.
             var ary = [[String:Any]]()
             
-            for (name, value) in params! {
+            for (name, value) in params {
                 ary.append([
                     "paramName":name,
                     "paramValue":value
