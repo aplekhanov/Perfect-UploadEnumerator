@@ -18,6 +18,8 @@
 //
 
 import PerfectLib
+import PerfectHTTP
+import PerfectMustache
 
 func addUploadHandlerRoutes() {
     
@@ -57,8 +59,8 @@ struct UploadHandler: MustachePageHandler { // all template handlers must inheri
         
         // Grab the fileUploads array and see what's there
         // If this POST was not multi-part, then this array will be empty
-        let uploads = request.fileUploads
-        if uploads.count > 0 {
+		
+        if let uploads = request.postFileUploads where uploads.count > 0 {
             // Create an array of dictionaries which will show what was uploaded
             // This array will be used in the corresponding mustache template
             var ary = [[String:Any]]()
@@ -99,9 +101,9 @@ struct UploadHandler: MustachePageHandler { // all template handlers must inheri
             try contxt.requestCompleted(withCollector: collector)
         } catch {
             let response = contxt.webResponse
-            response.setStatus(code: 500, message: "Server Error")
+            response.status = .internalServerError
             response.appendBody(string: "\(error)")
-            response.requestCompleted()
+            response.completed()
         }
 	}
 }
