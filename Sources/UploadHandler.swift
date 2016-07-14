@@ -21,25 +21,6 @@ import PerfectLib
 import PerfectHTTP
 import PerfectMustache
 
-func addUploadHandlerRoutes() {
-    
-    Routing.Routes["/"] = {
-        request, response in
-        
-        let webRoot = request.documentRoot
-        mustacheRequest(request: request, response: response, handler: UploadHandler(), templatePath: webRoot + "/index.mustache")
-    }
-}
-
-// This is the function which all Perfect Server modules must expose.
-// The system will load the module and call this function.
-// In here, register any handlers or perform any one-time tasks.
-// This is not required when compiling as a stand alone executable, but having it lets us function in a multi-module environment.
-public func PerfectServerModuleInit() {
-	
-    addUploadHandlerRoutes()
-}
-
 // Handler class
 // When referenced in a mustache template, this class will be instantiated to handle the request
 // and provide a set of values which will be used to complete the template.

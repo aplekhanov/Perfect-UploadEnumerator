@@ -18,23 +18,36 @@
 //
 
 import PerfectLib
+import PerfectHTTP
 import PerfectHTTPServer
+import PerfectMustache
 
-// Initialize base-level services
-PerfectServer.initializeServices()
+// Create HTTP server
+let server = HTTPServer()
 
-// Create our webroot
-let webRoot = "./webroot"
-try Dir(webRoot).create()
+let handler = {
+	(request: HTTPRequest, response: HTTPResponse) in
+	
+	let webRoot = request.documentRoot
+	mustacheRequest(request: request, response: response, handler: UploadHandler(), templatePath: webRoot + "/index.mustache")
+}
 
-// Add our routes and such
-addUploadHandlerRoutes()
+// Add our routes
+var routes = Routes()
+routes.add(method: .get, uri: "/", handler: handler)
+routes.add(method: .post, uri: "/", handler: handler)
+
+server.addRoutes(routes)
+
+// Set the listen port
+server.serverPort = 8181
+
+// Set the server's webroot
+server.documentRoot = "./webroot"
 
 do {
-    
-    // Launch the HTTP server on port 8181
-    try HTTPServer(documentRoot: webRoot).start(port: 8181)
-    
+    // Launch the server
+    try server.start()
 } catch PerfectError.networkError(let err, let msg) {
     print("Network error thrown: \(err) \(msg)")
 }
