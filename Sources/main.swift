@@ -43,7 +43,7 @@ server.addRoutes(routes)
 server.serverPort = 8181
 
 // Set the server's webroot
-server.documentRoot = "./webroot"
+server.documentRoot = "/Users/kjessup/development/PerfectNeu/PerfectExample-UploadEnumerator/webroot/"
 
 do {
     // Launch the server
